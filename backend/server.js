@@ -9,8 +9,29 @@ const { securityHeaders, nosqlSanitizer, authRateLimiter } = require('./middlewa
 // Load environment variables
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
+// Connect to MongoDB & ensure default admin exists
+connectDB().then(async () => {
+  try {
+    const User = require('./models/User');
+    const adminExists = await User.findOne({
+      $or: [{ username: 'admin' }, { role: 'partner' }, { userType: 'Administration' }]
+    });
+    if (!adminExists) {
+      console.log('🌱 No admin user found. Creating default admin (admin / admin123)...');
+      await User.create({
+        username: 'admin',
+        password: 'admin123',
+        displayName: 'System Admin',
+        companyName: 'CDB Portal V2',
+        role: 'partner',
+        userType: 'Administration',
+      });
+      console.log('✅ Default admin user created successfully (username: admin, password: admin123)!');
+    }
+  } catch (err) {
+    console.error('Error ensuring default admin:', err.message);
+  }
+});
 
 // Ensure upload folders exist
 const uploadDir = path.join(__dirname, 'uploads');
@@ -24,29 +45,10 @@ if (!fs.existsSync(screenshotDir)) {
 
 const app = express();
 
-// CORS - allow frontend origins
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:5173',
-  'http://localhost',
-  'https://localhost',
-  'capacitor://localhost',
-  'https://smt-portal-i5pm.vercel.app',
-  'https://smt-portal-teal.vercel.app',
-  'https://cdbportal.cloud',
-  'http://cdbportal.cloud',
-  'https://www.cdbportal.cloud',
-  'http://www.cdbportal.cloud',
-  process.env.FRONTEND_URL
-].filter(Boolean);
-
-// Remove duplicates
-const uniqueOrigins = [...new Set(allowedOrigins)];
-
+// CORS - allow all frontend origins including all vercel apps
 app.use(
   cors({
-    origin: uniqueOrigins,
+    origin: true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -55,7 +57,7 @@ app.use(
 
 // Explicitly handle preflight OPTIONS requests for all routes
 app.options('*', cors({
-  origin: uniqueOrigins,
+  origin: true,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
