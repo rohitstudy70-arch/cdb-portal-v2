@@ -95,7 +95,13 @@ app.use('/api/certificates', require('./routes/certificates'));
 
 // Health check route
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+  const mongoose = require('mongoose');
+  res.json({
+    status: 'OK',
+    dbHost: mongoose.connection.host || 'unknown',
+    dbName: mongoose.connection.name || 'unknown',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Global error handler
