@@ -10,10 +10,7 @@ const { securityHeaders, nosqlSanitizer, authRateLimiter } = require('./middlewa
 dotenv.config();
 
 // Connect to MongoDB
-connectDB().then(() => {
-  const syncDevices = require('./utils/syncDevices');
-  syncDevices();
-});
+connectDB();
 
 // Ensure upload folders exist
 const uploadDir = path.join(__dirname, 'uploads');
