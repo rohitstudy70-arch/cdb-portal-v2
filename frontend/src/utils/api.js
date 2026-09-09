@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-// Get API URL from environment variable or use localhost default
-let API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Get API URL from environment variable or use production Render default
+let API_BASE_URL = import.meta.env.VITE_API_URL || (import.meta.env.MODE === 'production' || window.location.hostname !== 'localhost' ? 'https://cdb-portal-v2.onrender.com/api' : 'http://localhost:5000/api');
 
 // Safety: ensure URL ends with /api (in case env var is set without it)
 if (!API_BASE_URL.endsWith('/api')) {
