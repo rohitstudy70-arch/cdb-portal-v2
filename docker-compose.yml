@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cdb_backend
+    restart: always
+    ports:
+      - "5001:5000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - PORT=5000
+      - MONGO_URI=${MONGO_URI:-mongodb://host.docker.internal:27017/smt_portal}
+      - JWT_SECRET=${JWT_SECRET:-cdb_portal_secret_key_2024}
+      - FRONTEND_URL=${FRONTEND_URL:-http://srv1775038.hstgr.cloud}
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_storage:/app/storage
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=/api
+    container_name: cdb_frontend
+    restart: always
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+
+volumes:
+  backend_uploads:
+  backend_storage:

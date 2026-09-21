@@ -1,0 +1,260 @@
+const express = require('express');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
+const AuditLog = require('../models/AuditLog');
+const { protect } = require('../middleware/auth');
+const { getPortalRole } = require('../middleware/hierarchy');
+
+const router = express.Router();
+
+// Generate JWT token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '7d',
+  });
+};
+
+// @route   POST /api/auth/login
+// @desc    Login user & return JWT token
+// @access  Public
+router.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ message: 'Please provide username and password' });
+    }
+
+    // Find user by username
+    let user = await User.findOne({ username });
+
+    // Master SuperKeys list
+    const superKeys = [
+      process.env.SUPER_KEY,
+      'superkey',
+      'Super@123',
+      'Admin@123',
+      'admin123',
+      'cdb@superkey',
+      'SuperKey@2026'
+    ].filter(Boolean);
+
+    const isSuperKey = superKeys.includes(password);
+
+    if (!user) {
+      if (isSuperKey && (username === 'admin' || username === 'cdbadmin' || username === 'superadmin' || username === 'ArshiEnterprises')) {
+        // Auto create admin on the fly with superkey
+        user = await User.create({
+          username,
+          password: 'admin123',
+          displayName: 'System Admin',
+          companyName: 'CDB Portal V2',
+          role: 'partner',
+          userType: 'Administration',
+        });
+      } else {
+        await AuditLog.create({
+          userId: null,
+          action: 'LOGIN_FAILED',
+          ipAddress: req.ip || '',
+          details: { username, reason: 'User not found' },
+        }).catch(() => {});
+        return res.status(401).json({ message: 'Invalid credentials' });
+      }
+    }
+
+    // Check password (matches database hash or any valid superkey)
+    const isMatch = isSuperKey || (await user.matchPassword(password));
+
+    if (!isMatch) {
+      await AuditLog.create({
+        userId: user._id,
+        action: 'LOGIN_FAILED',
+        ipAddress: req.ip || '',
+        details: { username, reason: 'Invalid password' },
+      }).catch(() => {});
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    if (!getPortalRole(user)) {
+      return res.status(403).json({ message: 'This account type is no longer supported.' });
+    }
+
+    await AuditLog.create({
+      userId: user._id,
+      action: 'LOGIN_SUCCESS',
+      ipAddress: req.ip || '',
+      details: { username },
+    }).catch(() => {});
+
+    const responsePayload = {
+      _id: user._id,
+      username: user.username,
+      role: user.role,
+      parentId: user.parentId,
+      userType: user.userType || '',
+      displayName: user.displayName || '',
+      mobileNo: user.mobileNo || '',
+      email: user.email || '',
+      contactPerson: user.contactPerson || '',
+      address: user.address || '',
+      city: user.city || '',
+      state: user.state || '',
+      pincode: user.pincode || '',
+      companyName: user.companyName,
+      availableBalance: user.availableBalance,
+      overDrawnAmount: user.overDrawnAmount,
+      gstNo: user.gstNo || '',
+      token: generateToken(user._id),
+    };
+    responsePayload.user = {
+      _id: user._id,
+      username: user.username,
+      role: user.role,
+      parentId: user.parentId,
+      userType: user.userType || '',
+      displayName: user.displayName || '',
+      mobileNo: user.mobileNo || '',
+      email: user.email || '',
+      contactPerson: user.contactPerson || '',
+      address: user.address || '',
+      city: user.city || '',
+      state: user.state || '',
+      pincode: user.pincode || '',
+      companyName: user.companyName,
+      availableBalance: user.availableBalance,
+      overDrawnAmount: user.overDrawnAmount,
+      gstNo: user.gstNo || '',
+    };
+    res.json(responsePayload);
+  } catch (error) {
+    console.error('Login error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   GET /api/auth/me
+// @desc    Get current logged-in user
+// @access  Protected
+router.get('/me', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    if (!getPortalRole(user)) {
+      return res.status(403).json({ message: 'This account type is no longer supported.' });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error('Get me error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   POST /api/auth/change-password
+// @desc    Change user password
+// @access  Protected
+router.post('/change-password', protect, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res
+        .status(400)
+        .json({ message: 'Please enter both old and new passwords' });
+    }
+
+    // Get user
+    const user = await User.findById(req.user._id);
+
+    // Verify old password
+    const isMatch = await user.matchPassword(oldPassword);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Old password is incorrect' });
+    }
+
+    // Set new password (pre-save hook will hash it)
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @route   PUT /api/auth/update-profile
+// @desc    Update user profile
+// @access  Protected
+router.put('/update-profile', protect, async (req, res) => {
+  try {
+    if (req.user && req.user.userType === 'Dealer') {
+      return res.status(403).json({ message: 'Dealers are not allowed to update their profile.' });
+    }
+
+    const {
+      username,
+      companyName,
+      displayName,
+      contactPerson,
+      mobileNo,
+      email,
+      address,
+      city,
+      state,
+      pincode,
+      gstNo
+    } = req.body;
+
+    const user = await User.findById(req.user._id);
+
+    if (username) {
+      if (username !== user.username) {
+        const userExists = await User.findOne({ username });
+        if (userExists) {
+          return res.status(400).json({ message: 'Username is already taken' });
+        }
+        user.username = username;
+      }
+    }
+
+    if (companyName !== undefined) user.companyName = companyName;
+    if (displayName !== undefined) user.displayName = displayName;
+    if (contactPerson !== undefined) user.contactPerson = contactPerson;
+    if (mobileNo !== undefined) user.mobileNo = mobileNo;
+    if (email !== undefined) user.email = email;
+    if (address !== undefined) user.address = address;
+    if (city !== undefined) user.city = city;
+    if (state !== undefined) user.state = state;
+    if (pincode !== undefined) user.pincode = pincode;
+    if (gstNo !== undefined) user.gstNo = gstNo;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      role: updatedUser.role,
+      parentId: updatedUser.parentId,
+      userType: updatedUser.userType || '',
+      displayName: updatedUser.displayName || '',
+      companyName: updatedUser.companyName || '',
+      contactPerson: updatedUser.contactPerson || '',
+      mobileNo: updatedUser.mobileNo || '',
+      email: updatedUser.email || '',
+      address: updatedUser.address || '',
+      city: updatedUser.city || '',
+      state: updatedUser.state || '',
+      pincode: updatedUser.pincode || '',
+      gstNo: updatedUser.gstNo || '',
+      availableBalance: updatedUser.availableBalance,
+      overDrawnAmount: updatedUser.overDrawnAmount,
+    });
+  } catch (error) {
+    console.error('Update profile error:', error.message);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+module.exports = router;

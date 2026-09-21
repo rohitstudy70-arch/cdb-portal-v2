@@ -1,0 +1,448 @@
+import { useState, useEffect } from 'react';
+import { FaUserPlus, FaUser, FaList, FaEdit, FaCheck, FaTimes, FaSearch, FaTrash } from 'react-icons/fa';
+import api from '../../utils/api';
+import { useAuth } from '../../context/AuthContext';
+import './UserManagement.css';
+
+const getRole = (user) => {
+  if (user?.role === 'partner') return 'ADMIN';
+  if (user?.userType === 'Administration') return 'ADMIN';
+  if (user?.userType === 'Sub Dealer') return 'SUB_DEALER';
+  return 'DEALER';
+};
+
+const userTypesByRole = {
+  ADMIN: ['Administration', 'Dealer', 'Sub Dealer'],
+  DEALER: ['Sub Dealer'],
+  SUB_DEALER: [],
+};
+
+const UserManagement = () => {
+  const { user } = useAuth();
+  const role = getRole(user);
+  const isFullAdmin = user?.role === 'partner' && user?.userType !== 'Administration';
+  const allowedUserTypes = userTypesByRole[role] || [];
+  const [subUsers, setSubUsers] = useState([]);
+  const [dealers, setDealers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  
+  // Form State
+  const [userType, setUserType] = useState(allowedUserTypes[0] || 'Sub Dealer');
+  const [displayName, setDisplayName] = useState('');
+  const [mobileNo, setMobileNo] = useState('');
+  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [parentId, setParentId] = useState('');
+  
+  // Edit State
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingUserId, setEditingUserId] = useState(null);
+  
+  // Filters State
+  const [limit, setLimit] = useState(5);
+  const [search, setSearch] = useState('');
+
+  const fetchSubUsers = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get('/users/sub-users');
+      setSubUsers(res.data);
+      setLoading(false);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to fetch users list. Please try again.');
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSubUsers();
+    if (role === 'ADMIN') {
+      api.get('/users/sub-users').then((res) => {
+        const dealerList = res.data.filter(
+          (u) => u.userType === 'Dealer' || u.userType === '' || u.role === 'partner'
+        );
+        setDealers(dealerList);
+      }).catch(console.error);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (allowedUserTypes.length > 0 && !allowedUserTypes.includes(userType)) {
+      setUserType(allowedUserTypes[0]);
+    }
+  }, [allowedUserTypes, userType]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+
+    if (!displayName.trim() || !username.trim() || (!isEditMode && !password.trim())) {
+      setError('Display Name, Username and Password are required.');
+      return;
+    }
+
+    if (role === 'ADMIN' && userType === 'Sub Dealer' && !parentId) {
+      setError('Please select a parent Dealer for this Sub Dealer.');
+      return;
+    }
+
+    try {
+      if (isEditMode) {
+        // Edit Mode
+        const payload = { userType, displayName, mobileNo, email, username };
+        if (role === 'ADMIN' && userType === 'Sub Dealer') payload.parentId = parentId;
+        await api.put(`/users/sub-user/${editingUserId}`, payload);
+        setSuccess('Sub-user updated successfully!');
+        resetForm();
+      } else {
+        // Add Mode
+        const payload = { userType, displayName, mobileNo, email, username, password };
+        if (role === 'ADMIN' && userType === 'Sub Dealer') payload.parentId = parentId;
+        await api.post('/users/sub-user', payload);
+        setSuccess('New sub-user created successfully!');
+        resetForm();
+      }
+      fetchSubUsers();
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Failed to submit form. Please try again.');
+    }
+  };
+
+  const handleEditClick = (user) => {
+    setIsEditMode(true);
+    setEditingUserId(user._id);
+    setUserType(user.userType || 'View Access User');
+    setDisplayName(user.displayName || '');
+    setMobileNo(user.mobileNo || '');
+    setEmail(user.email || '');
+    setUsername(user.username || '');
+    setParentId(user.parentId || '');
+    // Password isn't edited here
+    setPassword('');
+  };
+
+  const handleToggleStatus = async (userId) => {
+    try {
+      const res = await api.delete(`/users/sub-user/${userId}`);
+      setSuccess(res.data.message || 'User status updated!');
+      fetchSubUsers();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update status. Please try again.');
+    }
+  };
+
+  const canManageUser = (targetUser) => {
+    if (role !== 'ADMIN') return false;
+    const targetUserType = targetUser.userType;
+    if (targetUserType === 'Administration') {
+      // Only full admin can manage Administration users
+      return user?.role === 'partner' && user?.userType !== 'Administration';
+    }
+    if (targetUser.role === 'partner') {
+      return false;
+    }
+    return true;
+  };
+
+  const canDeleteUser = (targetUser) => {
+    if (role !== 'ADMIN') return false;
+    if (!canManageUser(targetUser)) return false;
+
+    const targetUserType = targetUser.userType || 'Dealer';
+    if (targetUserType === 'Dealer') {
+      return true;
+    }
+    if (targetUserType === 'Sub Dealer') {
+      return true;
+    }
+    if (targetUserType === 'Administration') {
+      return isFullAdmin;
+    }
+    return false;
+  };
+
+  const handleDeleteUser = async (userId, displayName) => {
+    if (window.confirm(`Are you sure you want to permanently delete user "${displayName}"? This will also unassign their devices.`)) {
+      try {
+        const res = await api.delete(`/users/sub-user/${userId}/permanent`);
+        setSuccess(res.data.message || 'User deleted successfully.');
+        fetchSubUsers();
+      } catch (err) {
+        console.error(err);
+        setError(err.response?.data?.message || 'Failed to delete user. Please try again.');
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setIsEditMode(false);
+    setEditingUserId(null);
+    setUserType(allowedUserTypes[0] || 'Sub Dealer');
+    setDisplayName('');
+    setMobileNo('');
+    setEmail('');
+    setUsername('');
+    setPassword('');
+    setParentId('');
+  };
+
+  // Filter & Search Logic
+  const filteredUsers = subUsers.filter(user => {
+    const query = search.toLowerCase();
+    return (
+      user.displayName?.toLowerCase().includes(query) ||
+      user.username?.toLowerCase().includes(query) ||
+      user.email?.toLowerCase().includes(query) ||
+      user.mobileNo?.includes(query)
+    );
+  }).slice(0, limit);
+
+  return (
+    <div className="user-management-container">
+      <div className="layout-columns">
+        {/* Left Column: User Details Form */}
+        <div className="form-column">
+          <div className="card-panel">
+            <div className="card-panel-header">
+              <FaUserPlus className="panel-icon" />
+              <span className="panel-title">USER DETAILS</span>
+              <span className="required-note">Note: All fields are required.</span>
+            </div>
+            
+            <div className="card-panel-body">
+              {error && <div className="alert-message error">{error}</div>}
+              {success && <div className="alert-message success">{success}</div>}
+              
+              <form onSubmit={handleSubmit} className="form-horizontal">
+                <div className="form-group-horizontal">
+                  <label htmlFor="userType">User Type</label>
+                  <div className="input-wrapper">
+                    <select
+                      id="userType"
+                      value={userType}
+                      onChange={(e) => { setUserType(e.target.value); setParentId(''); }}
+                    >
+                      {allowedUserTypes.map((type) => (
+                        <option value={type} key={type}>{type}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {role === 'ADMIN' && userType === 'Sub Dealer' && (
+                  <div className="form-group-horizontal">
+                    <label htmlFor="parentId">Dealer / Parent *</label>
+                    <div className="input-wrapper">
+                      <select
+                        id="parentId"
+                        value={parentId}
+                        onChange={(e) => setParentId(e.target.value)}
+                        required
+                      >
+                        <option value="">-- Select Dealer --</option>
+                        {dealers.map((d) => (
+                          <option value={d._id} key={d._id}>{d.displayName || d.username}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+                
+                <div className="form-group-horizontal">
+                  <label htmlFor="displayName">Display Name</label>
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      id="displayName"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder="Display Name"
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-group-horizontal">
+                  <label htmlFor="mobileNo">Mobile No</label>
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      id="mobileNo"
+                      value={mobileNo}
+                      onChange={(e) => setMobileNo(e.target.value)}
+                      placeholder="Mobile No"
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-group-horizontal">
+                  <label htmlFor="email">Email</label>
+                  <div className="input-wrapper">
+                    <input
+                      type="email"
+                      id="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Email ID"
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-group-horizontal">
+                  <label htmlFor="username">Username</label>
+                  <div className="input-wrapper">
+                    <input
+                      type="text"
+                      id="username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Enter Username"
+                    />
+                  </div>
+                </div>
+                
+                {!isEditMode && (
+                  <div className="form-group-horizontal">
+                    <label htmlFor="password">Password</label>
+                    <div className="input-wrapper">
+                      <input
+                        type="password"
+                        id="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Enter Password"
+                      />
+                    </div>
+                  </div>
+                )}
+                
+                <div className="form-actions-horizontal">
+                  <button type="button" className="btn-cancel" onClick={resetForm}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-submit">
+                    {isEditMode ? 'Update' : 'Submit'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Users List */}
+        <div className="list-column">
+          <div className="card-panel">
+            <div className="card-panel-header">
+              <FaList className="panel-icon" />
+              <span className="panel-title">USERS LIST</span>
+            </div>
+            
+            <div className="card-panel-body">
+              {/* Filters Bar */}
+              <div className="table-filters-bar">
+                <div className="filter-item">
+                  <label>Show</label>
+                  <select value={limit} onChange={(e) => setLimit(Number(e.target.value))}>
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                  </select>
+                </div>
+                
+                <div className="search-input-group">
+                  <input 
+                    type="text" 
+                    placeholder="Search..." 
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <button type="button"><FaSearch /></button>
+                </div>
+              </div>
+
+              {/* Table Container */}
+              <div className="table-responsive">
+                <table className="table-custom">
+                  <thead>
+                    <tr>
+                      <th style={{ width: '60px' }}>Sl No.</th>
+                      <th>User</th>
+                      <th>Type</th>
+                      <th>Mobile No</th>
+                      <th>User ID</th>
+                      <th style={{ width: '100px' }}>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loading ? (
+                      <tr>
+                        <td colSpan={6} className="text-center">Loading users list...</td>
+                      </tr>
+                    ) : filteredUsers.length > 0 ? (
+                      filteredUsers.map((user, index) => (
+                        <tr key={user._id || `user-${index}`} className={user.status === 'Inactive' ? 'row-inactive' : ''}>
+                          <td>{index + 1}</td>
+                          <td className="text-semibold">{user.displayName || user.username}</td>
+                          <td>{user.userType || 'N/A'}</td>
+                          <td>{user.mobileNo || '-'}</td>
+                          <td>{user.username || '-'}</td>
+                          <td>
+                            <div className="action-buttons">
+                              {canManageUser(user) && (
+                                <>
+                                  <button 
+                                    className="btn-action edit" 
+                                    title="Edit User"
+                                    onClick={() => handleEditClick(user)}
+                                  >
+                                    <FaEdit />
+                                  </button>
+                                  <button 
+                                    className={`btn-action status ${user.status === 'Active' ? 'active' : 'inactive'}`} 
+                                    title={user.status === 'Active' ? 'Deactivate User' : 'Activate User'}
+                                    onClick={() => handleToggleStatus(user._id)}
+                                  >
+                                    {user.status === 'Active' ? <FaCheck /> : <FaTimes />}
+                                  </button>
+                                </>
+                              )}
+                              {canDeleteUser(user) && (
+                                <button 
+                                  className="btn-action delete" 
+                                  title="Delete User"
+                                  onClick={() => handleDeleteUser(user._id, user.displayName || user.username)}
+                                >
+                                  <FaTrash />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={6} className="text-center">No user records found.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="table-info-row">
+                Showing 1 to {filteredUsers.length} of {filteredUsers.length} records
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default UserManagement;
