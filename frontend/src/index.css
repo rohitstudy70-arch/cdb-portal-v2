@@ -1,35 +1,58 @@
-/* Reset and global styles */
+/* ============================================
+   CDB Portal V2 — Premium Light Theme
+   ============================================ */
 :root {
-  /* Color Palette for Arshi Enterprises */
-  --primary-gradient: linear-gradient(180deg, #101d2c 0%, #080f18 100%);
-  --sidebar-bg: #0b131f;
-  --header-bg: #090f19;
-  
-  --accent-color: #f59e0b; /* Golden amber */
-  --accent-hover: #d97706;
-  --accent-light: rgba(245, 158, 11, 0.1);
-  
-  --primary-blue: #2563eb;
-  --primary-blue-hover: #1d4ed8;
-  
+  /* Backgrounds */
+  --primary-bg: #f0f2f5;
+  --secondary-bg: #ffffff;
+  --sidebar-bg: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  --sidebar-bg-solid: #1e293b;
+  --header-bg: #ffffff;
+
+  /* Cards */
+  --card-bg: #ffffff;
+  --card-bg-hover: #f8fafc;
+  --card-border: #e2e8f0;
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --card-shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  --card-shadow-xl: 0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 8px 16px -8px rgba(0, 0, 0, 0.06);
+
+  /* Accents */
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-light: rgba(59, 130, 246, 0.08);
+  --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+
+  --primary-blue: #3b82f6;
+  --primary-blue-hover: #2563eb;
+
+  /* Text */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
   --text-white: #ffffff;
-  --text-gray-light: rgba(255, 255, 255, 0.7);
   --text-dark: #0f172a;
-  --text-muted: #64748b;
-  
-  --bg-main: #f8fafc;
+  --text-gray-light: rgba(255, 255, 255, 0.7);
+
+  /* Legacy compat */
+  --bg-main: #f0f2f5;
   --bg-card: #ffffff;
   --border-color: #e2e8f0;
-  
+
+  /* Status */
   --success: #10b981;
   --success-dark: #059669;
   --danger: #ef4444;
   --danger-dark: #dc2626;
   --warning: #f59e0b;
-  
-  --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+
+  /* Misc */
+  --border-radius: 12px;
   --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --border-radius: 8px;
+
+  /* Sidebar (dark) text vars */
+  --accent-sidebar: #60a5fa;
+  --accent-sidebar-bg: rgba(96, 165, 250, 0.1);
 }
 
 * {
@@ -41,8 +64,10 @@
 body {
   font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg-main);
-  color: var(--text-dark);
+  color: var(--text-primary);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {
@@ -50,7 +75,7 @@ a {
   color: inherit;
 }
 
-input, select, button {
+input, select, button, textarea {
   font-family: inherit;
 }
 
@@ -71,4 +96,3 @@ input, select, button {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
-

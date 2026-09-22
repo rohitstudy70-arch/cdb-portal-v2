@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import gsap from 'gsap';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   FaAddressCard,
@@ -223,6 +224,7 @@ const CustomerDevicePortal = () => {
   const initialSearch = params.get('search') || '';
   const initialImei = params.get('imei') || '';
 
+  const portalContainerRef = useRef(null);
   const [notice, setNotice] = useState('');
   const [renewals, setRenewals] = useState([]);
   const [search, setSearch] = useState(initialSearch);
@@ -534,6 +536,43 @@ const CustomerDevicePortal = () => {
   useEffect(() => {
     setDeviceHistoryPage(1);
   }, [search, portalFromDate, portalToDate, portalDateMode, deviceTab]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo('.portal-titlebar',
+        { opacity: 0, y: -16 },
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' }
+      );
+
+      const statCards = document.querySelectorAll('.portal-stat');
+      if (statCards.length > 0) {
+        gsap.fromTo(statCards,
+          { opacity: 0, y: 28, scale: 0.94 },
+          { 
+            opacity: 1, 
+            y: 0, 
+            scale: 1, 
+            duration: 0.5, 
+            stagger: { each: 0.035, from: 'start' }, 
+            ease: 'back.out(1.4)',
+            clearProps: 'transform,opacity'
+          }
+        );
+      }
+
+      const panels = document.querySelectorAll('.portal-panel, .portal-table-container, .portal-actions-panel');
+      if (panels.length > 0) {
+        gsap.fromTo(panels,
+          { opacity: 0, y: 22 },
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power3.out', delay: 0.08 }
+        );
+      }
+    }, portalContainerRef);
+
+    return () => ctx.revert();
+  }, [activeView, loading, portalDateMode, summary, dueSummary]);
 
   const calculateNewExpiryDate = (rDateStr, val) => {
     if (!rDateStr) return '';
@@ -3384,7 +3423,7 @@ const CustomerDevicePortal = () => {
   };
 
   return (
-    <div className="portal-page">
+    <div className="portal-page" ref={portalContainerRef}>
       {notice ? <div className="portal-notice">{notice}</div> : null}
 
       <div className="portal-titlebar">

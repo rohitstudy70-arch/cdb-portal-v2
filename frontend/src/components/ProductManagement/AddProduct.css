@@ -1,3 +1,7 @@
+/* ============================================================
+   Product Management (Add Product) — Premium Light Theme
+   ============================================================ */
+
 .add-product-container .readonly-field {
   cursor: default;
 }
@@ -11,29 +15,33 @@
 
 .btn-inline-search {
   border: none;
-  border-radius: 6px;
-  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
-  color: #0b131f;
+  border-radius: 10px;
+  background: var(--accent-gradient);
+  color: #ffffff;
   min-height: 40px;
-  padding: 0 14px;
+  padding: 0 16px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
   font-size: 12.5px;
-  font-weight: 800;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
 }
 
 .btn-inline-search:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-hover, #2563eb) 0%, #4338ca 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
 }
 
 .btn-inline-search:disabled {
-  opacity: 0.65;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .add-product-table {
@@ -45,30 +53,34 @@
   align-items: center;
   justify-content: center;
   min-height: 24px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
-  background: #e2e8f0;
-  color: #334155;
+  background: #f1f5f9;
+  color: var(--text-primary, #1e293b);
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 700;
   white-space: nowrap;
+  border: 1px solid var(--card-border, #e2e8f0);
 }
 
 .product-type-pill.product-vltd {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: #eff6ff;
+  color: var(--primary-blue, #3b82f6);
+  border-color: #bfdbfe;
 }
 
 .product-type-pill.product-gps {
-  background: #dcfce7;
-  color: #166534;
+  background: #ecfdf5;
+  color: var(--success-dark, #059669);
+  border-color: #a7f3d0;
 }
 
 .product-type-pill.product-renewal,
 .product-type-pill.product-vltd-renewal,
 .product-type-pill.product-gps-renewal {
-  background: #fef3c7;
-  color: #92400e;
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
 }
 
 @media (max-width: 600px) {
@@ -92,26 +104,37 @@
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border: none;
-  border-radius: 3px;
+  border-radius: 6px;
   cursor: pointer;
-  color: #fff;
+  color: #ffffff;
   font-size: 12px;
-  transition: opacity 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-action:hover {
-  opacity: 0.8;
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .btn-action.edit {
-  background: #42a5f5;
+  background: var(--primary-blue, #3b82f6);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
+}
+
+.btn-action.edit:hover {
+  background: var(--primary-blue-hover, #2563eb);
 }
 
 .btn-action.delete {
-  background: #d32f2f;
+  background: var(--danger, #ef4444);
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.25);
+}
+
+.btn-action.delete:hover {
+  background: var(--danger-dark, #dc2626);
 }
 
 /* =========================================== */
@@ -151,4 +174,3 @@
     height: 34px;
   }
 }
-

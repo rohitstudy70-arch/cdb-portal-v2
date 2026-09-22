@@ -11,7 +11,7 @@ const LedgerBook = () => {
         </div>
         <div style={{ padding: '60px 24px', textAlign: 'center' }}>
           <FaBook style={{ fontSize: '48px', color: '#cbd5e1', marginBottom: '16px' }} />
-          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#334155', marginBottom: '8px' }}>Coming Soon</h3>
+          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1e293b', marginBottom: '8px' }}>Coming Soon</h3>
           <p style={{ fontSize: '13.5px', color: '#64748b', maxWidth: '400px', margin: '0 auto' }}>
             Ledger Book functionality will be available soon. Stay tuned!
           </p>

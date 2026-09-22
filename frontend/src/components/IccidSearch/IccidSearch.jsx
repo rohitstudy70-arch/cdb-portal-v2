@@ -273,12 +273,10 @@ Activation Date: ${formatDate(device.presentDate)}
 Expiry Date: ${formatDate(device.expiryDate)}
 
 --- VEHICLE DETAILS ---
-Vehicle Reg. Year: ${latestRequest?.registrationYear || device?.registrationYear || '—'}
 Activation Type: ${latestRenewal?.activationType || latestRequest?.activationMode || device?.activationType || '—'}
 Vehicle Condition: ${latestRequest?.vehicleCondition || device?.vehicleCondition || '—'}
 Vehicle Make: ${latestRequest?.vehicleMake || device?.vehicleMake || '—'}
 Vehicle Model: ${latestRequest?.vehicleModel || device?.vehicleModel || '—'}
-RTO: ${latestRequest?.rto || device?.rto || '—'}
 Vehicle No: ${latestRenewal?.vehicleNumber || latestRequest?.vehicleNo || device?.vehicleNo || device?.vehicleNumber || '—'}
 Engine No: ${latestRequest?.engineNo || device?.engineNo || '—'}
 Chassis No: ${latestRequest?.chassisNo || device?.chassisNo || '—'}
@@ -810,10 +808,6 @@ Software: ${softwareInput || device?.software || latestRequest?.software || late
                 <tbody>
                   <tr>
                     <td>
-                      <div className="grid-cell-label">Vehicle Reg. Year</div>
-                      <div className="grid-cell-value">{latestRequest?.registrationYear || device?.registrationYear || '—'}</div>
-                    </td>
-                    <td>
                       <div className="grid-cell-label">Activation Type</div>
                       <div className="grid-cell-value">{latestRenewal?.activationType || latestRequest?.activationMode || device?.activationType || '—'}</div>
                     </td>
@@ -821,22 +815,16 @@ Software: ${softwareInput || device?.software || latestRequest?.software || late
                       <div className="grid-cell-label">Vehicle Condition</div>
                       <div className="grid-cell-value">{latestRequest?.vehicleCondition || device?.vehicleCondition || '—'}</div>
                     </td>
-                  </tr>
-                  <tr>
                     <td>
                       <div className="grid-cell-label">Vehicle Make</div>
                       <div className="grid-cell-value">{latestRequest?.vehicleMake || device?.vehicleMake || '—'}</div>
                     </td>
+                  </tr>
+                  <tr>
                     <td>
                       <div className="grid-cell-label">Vehicle Model</div>
                       <div className="grid-cell-value">{latestRequest?.vehicleModel || device?.vehicleModel || '—'}</div>
                     </td>
-                    <td>
-                      <div className="grid-cell-label">RTO</div>
-                      <div className="grid-cell-value">{latestRequest?.rto || device?.rto || '—'}</div>
-                    </td>
-                  </tr>
-                  <tr>
                     <td>
                       <div className="grid-cell-label">Vehicle No</div>
                       <div className="grid-cell-value bold">{latestRenewal?.vehicleNumber || latestRequest?.vehicleNo || device?.vehicleNo || device?.vehicleNumber || '—'}</div>
@@ -845,7 +833,9 @@ Software: ${softwareInput || device?.software || latestRequest?.software || late
                       <div className="grid-cell-label">Engine No</div>
                       <div className="grid-cell-value bold">{latestRequest?.engineNo || device?.engineNo || '—'}</div>
                     </td>
-                    <td>
+                  </tr>
+                  <tr>
+                    <td colSpan={3}>
                       <div className="grid-cell-label">Chassis No</div>
                       <div className="grid-cell-value bold">{latestRequest?.chassisNo || device?.chassisNo || '—'}</div>
                     </td>

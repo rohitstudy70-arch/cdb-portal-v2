@@ -1,7 +1,9 @@
+/* Proforma Invoice Styling — CDB Portal V2 Premium Light Theme */
+
 .proforma-invoice-wrapper {
   min-height: 100vh;
-  background: #eef4f6;
-  color: #1a2a30;
+  background: var(--bg-main);
+  color: var(--text-primary);
   padding: 32px 16px;
   font-family: 'Nunito Sans', sans-serif;
 }
@@ -31,22 +33,27 @@
 }
 
 .proforma-btn-primary {
-  background: #007b8a;
+  background: var(--accent-gradient);
   color: #fff;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.25);
 }
 
 .proforma-btn-primary:hover {
-  background: #005a66;
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
 }
 
 .proforma-btn-secondary {
-  background: #fff;
-  color: #007b8a;
-  border: 1.5px solid #007b8a;
+  background: #ffffff;
+  color: var(--accent-color);
+  border: 1.5px solid var(--accent-color);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .proforma-btn-secondary:hover {
-  background: #e0f4f7;
+  background: var(--accent-light);
+  border-color: var(--accent-hover);
+  color: var(--accent-hover);
 }
 
 .proforma-btn svg {
@@ -56,22 +63,23 @@
 }
 
 .proforma-page {
-  background: #fff;
+  background: #ffffff;
   max-width: 794px;
   margin: 0 auto;
-  border-radius: 12px;
+  border-radius: var(--border-radius);
   overflow: hidden;
-  box-shadow: 0 6px 30px rgba(0, 80, 100, 0.12);
-  border: 1px solid #cce4e8;
+  box-shadow: var(--card-shadow-lg);
+  border: 1px solid var(--card-border);
 }
 
 .proforma-header {
-  background: #007b8a;
+  background: #f8fafc;
   padding: 28px 28px 22px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
+  border-bottom: 1px solid var(--card-border);
 }
 
 .proforma-brand-row {
@@ -89,14 +97,14 @@
 
 .proforma-brand-name {
   font-family: 'Nunito', sans-serif;
-  font-size: 34px;
+  font-size: 32px;
   font-weight: 800;
-  color: #fff;
-  letter-spacing: 0;
+  color: var(--text-dark);
+  letter-spacing: -0.5px;
 }
 
 .proforma-brand-sub {
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--text-secondary);
   font-size: 11.5px;
   margin-top: 2px;
   line-height: 1.55;
@@ -111,32 +119,33 @@
   font-family: 'Nunito', sans-serif;
   font-size: 22px;
   font-weight: 800;
-  color: #fff;
+  color: var(--accent-color);
   letter-spacing: 1px;
   text-transform: uppercase;
 }
 
 .proforma-inv-meta {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   font-size: 12.5px;
   margin-top: 7px;
   line-height: 1.75;
 }
 
 .proforma-accent-bar {
-  height: 5px;
-  background: linear-gradient(90deg, #f0a500 0%, #f5d26e 50%, #b2e4ec 100%);
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-color) 0%, #6366f1 50%, #8b5cf6 100%);
 }
 
 .proforma-info-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  border-bottom: 1.5px solid #cce4e8;
+  border-bottom: 1px solid var(--card-border);
+  background: #fafbfc;
 }
 
 .proforma-info-box {
   padding: 16px 20px;
-  border-right: 1px solid #cce4e8;
+  border-right: 1px solid var(--card-border);
 }
 
 .proforma-info-box:first-child {
@@ -149,11 +158,11 @@
 }
 
 .proforma-info-box-head {
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #007b8a;
+  color: var(--accent-color);
   margin-bottom: 9px;
   display: flex;
   align-items: center;
@@ -165,20 +174,20 @@
   display: inline-block;
   width: 3px;
   height: 12px;
-  background: #f0a500;
+  background: var(--accent-color);
   border-radius: 2px;
 }
 
 .proforma-info-box p {
   font-size: 12.5px;
-  color: #1a2a30;
+  color: var(--text-secondary);
   line-height: 1.65;
 }
 
 .proforma-co-name {
   font-weight: 700;
   font-size: 13px;
-  color: #1a2a30;
+  color: var(--text-primary);
   margin-bottom: 3px;
 }
 
@@ -193,16 +202,17 @@
 }
 
 .proforma-table thead tr {
-  background: #007b8a;
+  background: #f8fafc;
 }
 
 .proforma-table thead th {
-  color: #fff;
+  color: var(--text-secondary);
   font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.7px;
   padding: 11px 12px;
+  border-bottom: 2px solid var(--card-border);
 }
 
 .proforma-table thead th:first-child {
@@ -215,16 +225,18 @@
 }
 
 .proforma-table tbody tr {
-  border-bottom: 1px solid #cce4e8;
+  border-bottom: 1px solid var(--card-border);
+  transition: background 0.15s ease;
 }
 
 .proforma-table tbody tr:hover {
-  background: #e0f4f7;
+  background: #f8fafc;
 }
 
 .proforma-table td {
   padding: 12px;
   font-size: 13px;
+  color: var(--text-primary);
   vertical-align: top;
 }
 
@@ -250,11 +262,11 @@
 }
 
 .proforma-sub-row td {
-  background: #e0f4f7;
+  background: #eff6ff;
   font-weight: 700;
   font-size: 13px;
-  color: #005a66;
-  border-top: 2px solid #b2e4ec;
+  color: var(--accent-color);
+  border-top: 1px solid var(--card-border);
 }
 
 .proforma-bottom {
@@ -268,13 +280,13 @@
 
 .proforma-amount-words {
   font-size: 12.5px;
-  color: #1a2a30;
+  color: var(--text-secondary);
   margin-bottom: 14px;
   line-height: 1.6;
 }
 
 .proforma-amount-words strong {
-  color: #005a66;
+  color: var(--accent-color);
 }
 
 .proforma-section-title {
@@ -282,7 +294,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #007b8a;
+  color: var(--accent-color);
   margin-bottom: 10px;
   display: flex;
   align-items: center;
@@ -294,7 +306,7 @@
   display: inline-block;
   width: 3px;
   height: 11px;
-  background: #f0a500;
+  background: var(--accent-color);
   border-radius: 2px;
 }
 
@@ -316,21 +328,21 @@
 .proforma-tc-icon {
   width: 12px;
   height: 12px;
-  color: #007b8a;
+  color: var(--accent-color);
   margin-top: 2px;
   flex-shrink: 0;
 }
 
 .proforma-tc-text {
   font-size: 11.5px;
-  color: #2a4a52;
+  color: var(--text-secondary);
   line-height: 1.5;
   flex: 1;
 }
 
 .proforma-bank-row {
   font-size: 12px;
-  color: #5a7a82;
+  color: var(--text-secondary);
   padding: 4px 0;
   display: flex;
   gap: 8px;
@@ -339,27 +351,27 @@
 
 .proforma-bank-row span:first-child {
   font-weight: 600;
-  color: #1a2a30;
+  color: var(--text-secondary);
   min-width: 115px;
 }
 
 .proforma-bank-row span:last-child {
   font-weight: 700;
-  color: #1a2a30;
+  color: var(--text-primary);
 }
 
 .proforma-tax-block {
   padding-left: 26px;
-  border-left: 1.5px solid #cce4e8;
+  border-left: 1px solid var(--card-border);
 }
 
 .proforma-tax-row {
   display: flex;
   justify-content: space-between;
   font-size: 12.5px;
-  padding: 4.5px 0;
-  border-bottom: 1px solid #eef4f6;
-  color: #1a2a30;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--card-border);
+  color: var(--text-primary);
 }
 
 .proforma-tax-row:last-child {
@@ -367,30 +379,33 @@
 }
 
 .proforma-tax-row.proforma-hl {
-  color: #005a66;
+  color: var(--accent-color);
   font-weight: 700;
 }
 
 .proforma-total-box {
-  background: #007b8a;
-  border-radius: 8px;
-  padding: 15px 18px;
+  background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%);
+  border: 1.5px solid #bfdbfe;
+  border-radius: var(--border-radius);
+  padding: 16px 18px;
   margin-top: 14px;
   text-align: center;
+  box-shadow: var(--card-shadow);
 }
 
 .proforma-total-label {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-secondary);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 1px;
   margin-bottom: 3px;
+  font-weight: 700;
 }
 
 .proforma-total-amount {
-  color: #fff;
+  color: var(--accent-color);
   font-family: 'Nunito', sans-serif;
-  font-size: 23px;
+  font-size: 24px;
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -398,13 +413,13 @@
 .proforma-footer {
   margin: 16px 28px 22px;
   padding-top: 14px;
-  border-top: 1.5px solid #cce4e8;
+  border-top: 1px solid var(--card-border);
   text-align: center;
 }
 
 .proforma-footer p {
   font-size: 11px;
-  color: #5a7a82;
+  color: var(--text-muted);
   line-height: 1.5;
   font-style: italic;
 }
@@ -416,7 +431,7 @@
   justify-content: center;
   height: 300px;
   font-size: 16px;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .proforma-loading svg {
@@ -424,22 +439,23 @@
   margin-bottom: 15px;
   width: 40px;
   height: 40px;
-  color: #007b8a;
+  color: var(--accent-color);
 }
 
 .proforma-error {
-  background: #fee;
-  border: 1px solid #fcc;
-  border-radius: 6px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--border-radius);
   padding: 30px;
   text-align: center;
   margin: 30px auto;
   max-width: 500px;
-  color: #c33;
+  color: var(--danger);
 }
 
 .proforma-error h2 {
   margin-bottom: 10px;
+  color: var(--danger-dark);
 }
 
 @keyframes spin {
@@ -487,32 +503,44 @@
     margin: 0;
     padding: 0;
     page-break-inside: avoid;
+    background: #fff;
   }
 
   .proforma-header {
     padding: 10px 16px 8px;
+    background: #0284c7;
   }
 
   .proforma-brand-name {
     font-size: 26px;
+    color: #fff;
   }
 
   .proforma-brand-sub {
     font-size: 10px;
     line-height: 1.4;
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .proforma-inv-label {
     font-size: 18px;
+    color: #fff;
   }
 
   .proforma-inv-meta {
     font-size: 11px;
     margin-top: 4px;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .proforma-info-grid {
+    background: #fff;
+    border-bottom: 1.5px solid #e2e8f0;
   }
 
   .proforma-info-box {
     padding: 6px 12px;
+    border-right: 1px solid #e2e8f0;
   }
 
   .proforma-info-box:first-child {
@@ -526,20 +554,31 @@
   .proforma-info-box-head {
     margin-bottom: 4px;
     font-size: 9.5px;
+    color: #0284c7;
   }
 
   .proforma-info-box p {
     font-size: 11px;
     line-height: 1.4;
+    color: #1e293b;
   }
 
   .proforma-co-name {
     font-size: 11.5px;
     margin-bottom: 1px;
+    color: #0f172a;
   }
 
   .proforma-table {
     margin-top: 8px;
+  }
+
+  .proforma-table thead tr {
+    background: #0284c7;
+  }
+
+  .proforma-table thead th {
+    color: #fff;
   }
 
   .proforma-table td, 
@@ -548,13 +587,36 @@
     font-size: 11px;
   }
 
+  .proforma-table td {
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
   .proforma-empty-row td {
     height: 16px;
+  }
+
+  .proforma-sub-row td {
+    background: #f0f9ff;
+    color: #0369a1;
+    border-top: 2px solid #bae6fd;
   }
 
   .proforma-bottom {
     margin-top: 6px;
     padding: 0 16px 8px;
+  }
+
+  .proforma-amount-words {
+    color: #1e293b;
+  }
+
+  .proforma-amount-words strong {
+    color: #0369a1;
+  }
+
+  .proforma-section-title {
+    color: #0284c7;
   }
 
   .proforma-tc-list {
@@ -570,48 +632,73 @@
     width: 9px;
     height: 9px;
     margin-top: 1px;
+    color: #0284c7;
   }
 
   .proforma-tc-text {
     font-size: 9px;
     line-height: 1.2;
+    color: #475569;
   }
 
   .proforma-bank-row {
     padding: 1px 0;
     font-size: 9.5px;
+    color: #64748b;
   }
 
   .proforma-bank-row span:first-child {
     min-width: 90px;
+    color: #475569;
+  }
+
+  .proforma-bank-row span:last-child {
+    color: #0f172a;
   }
 
   .proforma-tax-block {
     padding-left: 12px;
     padding-top: 0;
+    border-left: 1.5px solid #e2e8f0;
   }
 
   .proforma-tax-row {
     padding: 2px 0;
     font-size: 10.5px;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .proforma-tax-row.proforma-hl {
+    color: #0369a1;
   }
 
   .proforma-total-box {
     padding: 6px 10px;
     margin-top: 4px;
+    background: #0284c7;
+    box-shadow: none;
+    border: none;
+  }
+
+  .proforma-total-label {
+    color: rgba(255, 255, 255, 0.85);
   }
 
   .proforma-total-amount {
     font-size: 16px;
+    color: #fff;
   }
 
   .proforma-footer {
     margin: 6px 16px 6px;
     padding-top: 4px;
+    border-top: 1.5px solid #e2e8f0;
   }
 
   .proforma-footer p {
     font-size: 8.5px;
+    color: #64748b;
   }
 
   .proforma-table tbody tr:hover {
@@ -644,7 +731,7 @@
 
   .proforma-info-box {
     border-right: none;
-    border-bottom: 1px solid #cce4e8;
+    border-bottom: 1px solid var(--card-border);
   }
 
   .proforma-info-box:last-child {
@@ -667,7 +754,7 @@
 
   .proforma-tax-block {
     border-left: none;
-    border-top: 1.5px solid #cce4e8;
+    border-top: 1.5px solid var(--card-border);
     padding-left: 0;
     padding-top: 16px;
   }

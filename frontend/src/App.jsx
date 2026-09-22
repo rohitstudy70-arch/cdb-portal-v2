@@ -48,22 +48,21 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        backgroundColor: '#0b0f19',
-        color: '#f8fafc',
+        backgroundColor: '#f0f2f5',
+        color: '#1e293b',
         fontFamily: "'Outfit', 'Inter', system-ui, -apple-system, sans-serif",
         textAlign: 'center',
         padding: '2rem',
         boxSizing: 'border-box',
       }}>
         <div style={{
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '16px',
+          background: '#ffffff',
+          border: '1px solid #e2e8f0',
+          borderRadius: '20px',
           padding: '3rem 2rem',
           maxWidth: '480px',
           width: '100%',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
-          backdropFilter: 'blur(10px)',
+          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.08)',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -72,13 +71,12 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
             width: '64px',
             height: '64px',
             borderRadius: '50%',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.2)',
+            backgroundColor: '#fef2f2',
+            border: '1px solid #fecaca',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             marginBottom: '1.5rem',
-            boxShadow: '0 0 20px rgba(239, 68, 68, 0.15)',
           }}>
             <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -89,14 +87,14 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
             fontSize: '2rem',
             fontWeight: '700',
             margin: '0 0 0.75rem 0',
-            color: '#f8fafc',
+            color: '#1e293b',
             letterSpacing: '-0.025em',
           }}>
             Access Denied
           </h1>
           <p style={{
             fontSize: '0.95rem',
-            color: '#94a3b8',
+            color: '#64748b',
             lineHeight: '1.6',
             margin: '0 0 2rem 0',
           }}>
@@ -106,20 +104,20 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#2563eb',
+            background: 'linear-gradient(135deg, #3b82f6, #6366f1)',
             color: '#ffffff',
             textDecoration: 'none',
             fontWeight: '600',
             fontSize: '0.95rem',
             padding: '0.75rem 1.75rem',
-            borderRadius: '8px',
-            transition: 'background-color 0.2s',
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.2)',
+            borderRadius: '10px',
+            transition: 'all 0.2s',
+            boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)',
             border: 'none',
             cursor: 'pointer',
           }}
-          onMouseEnter={(e) => { e.target.style.backgroundColor = '#1d4ed8' }}
-          onMouseLeave={(e) => { e.target.style.backgroundColor = '#2563eb' }}
+          onMouseEnter={(e) => { e.target.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.35)' }}
+          onMouseLeave={(e) => { e.target.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.25)' }}
           >
             Back to Dashboard
           </a>

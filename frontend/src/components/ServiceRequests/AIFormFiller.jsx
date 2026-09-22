@@ -31,7 +31,6 @@ const FORM_STEPS = [
   { key: 'vehicleNo',        label: 'Vehicle number bolo (jaise MH12AB1234)',       transform: t=>t.replace(/\s+/g,'').toUpperCase(),             validate: v=>v.length>=6?null:'Valid vehicle number bolo' },
   { key: 'vehicleMake',      label: 'Vehicle ka make bolo (jaise Tata, Mahindra)',  transform: t=>t.trim(),                                       validate: v=>v.length>=2?null:'Vehicle make bolo' },
   { key: 'vehicleModel',     label: 'Vehicle ka model bolo (jaise Ace, Bolero)',    transform: t=>t.trim(),                                       validate: v=>v.length>=1?null:'Vehicle model bolo' },
-  { key: 'registrationYear', label: 'Registration year bolo (jaise 2022)',          transform: t=>{ const m=t.match(/\b(19|20)\d{2}\b/); return m?m[0]:t.replace(/\D/g,'').slice(0,4); }, validate: v=>/^\d{4}$/.test(v)?null:'4 digit year bolo' },
   { key: 'chassisNo',        label: 'Chassis number bolo',                          transform: t=>t.replace(/\s+/g,'').toUpperCase(),             validate: v=>v.length>=5?null:'Chassis number bolo' },
   { key: 'engineNo',         label: 'Engine number bolo',                           transform: t=>t.replace(/\s+/g,'').toUpperCase(),             validate: v=>v.length>=5?null:'Engine number bolo' },
   { key: 'customerName',     label: 'Customer ka poora naam bolo',                  transform: t=>t.trim().replace(/\s+/g,' '),                   validate: v=>v.length>=3?null:'Customer naam bolo' },
@@ -43,9 +42,9 @@ const FORM_STEPS = [
 const isSpeechSupported = () =>
   typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
 
-const FILLABLE_KEYS = ['vehicleNo','vehicleMake','vehicleModel','registrationYear',
+const FILLABLE_KEYS = ['vehicleNo','vehicleMake','vehicleModel',
                        'chassisNo','engineNo','customerName','regMobNo','aadharNo',
-                       'address','rto','iccid','serialNo'];
+                       'address','iccid','serialNo'];
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const AIFormFiller = ({ formData, setFormData, onSelectDevice, onClose }) => {
@@ -169,15 +168,13 @@ const AIFormFiller = ({ formData, setFormData, onSelectDevice, onClose }) => {
     if (extracted.vehicleNo)         lines.push(`🚗 Vehicle No: ${extracted.vehicleNo}`);
     if (extracted.vehicleMake)       lines.push(`🏭 Make: ${extracted.vehicleMake}`);
     if (extracted.vehicleModel)      lines.push(`📋 Model: ${extracted.vehicleModel}`);
-    if (extracted.registrationYear)  lines.push(`📅 Year: ${extracted.registrationYear}`);
     if (extracted.chassisNo)         lines.push(`🔩 Chassis: ${extracted.chassisNo}`);
     if (extracted.engineNo)          lines.push(`⚙️ Engine: ${extracted.engineNo}`);
     if (extracted.regMobNo)          lines.push(`📱 Mobile: ${extracted.regMobNo}`);
     if (extracted.aadharNo)          lines.push(`🪪 Aadhar: ${extracted.aadharNo}`);
     if (extracted.address)           lines.push(`📍 Address: ${extracted.address.slice(0, 60)}...`);
-    if (extracted.rto)               lines.push(`🏢 RTO: ${extracted.rto}`);
 
-    const mandatory = ['vehicleNo','vehicleMake','vehicleModel','registrationYear',
+    const mandatory = ['vehicleNo','vehicleMake','vehicleModel',
                        'chassisNo','engineNo','customerName','regMobNo','aadharNo','address'];
     const missing = mandatory.filter(k => !extracted[k] || !extracted[k].trim());
 

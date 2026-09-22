@@ -2455,22 +2455,6 @@ const ActivationRequests = () => {
                     </div>
 
                     <div className="form-group-custom">
-                      <label>Registration Year <span className="required-star">*</span></label>
-                      <select
-                        value={formData.registrationYear}
-                        onChange={(e) => setFormData({...formData, registrationYear: e.target.value})}
-                        required
-                      >
-                        <option value="">Select Year</option>
-                        <option value="NA">NA</option>
-                        {Array.from({ length: 25 }, (_, i) => {
-                          const year = new Date().getFullYear() - i;
-                          return <option key={year} value={year}>{year}</option>;
-                        })}
-                      </select>
-                    </div>
-
-                    <div className="form-group-custom">
                       <label>Vehicle Number {formData.vehicleCondition !== 'New' && <span className="required-star">*</span>}</label>
                       <input 
                         type="text" 
@@ -2479,23 +2463,6 @@ const ActivationRequests = () => {
                         placeholder="e.g. RJ14-GA-1234"
                         style={{ textTransform: 'uppercase' }}
                         required={formData.vehicleCondition !== 'New'}
-                      />
-                    </div>
-
-                    <div className="form-group-custom">
-                      <label>RTO <span className="required-star">*</span></label>
-                      <input 
-                        type="text" 
-                        value={formData.rto}
-                        onChange={(e) => {
-                          const val = e.target.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-                          if (val.length <= 4) {
-                            setFormData({...formData, rto: val});
-                          }
-                        }}
-                        placeholder="e.g. RJ14"
-                        maxLength={4}
-                        required
                       />
                     </div>
 

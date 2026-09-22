@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import gsap from 'gsap';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../utils/api';
@@ -796,8 +797,47 @@ const DueDashboard = () => {
     }
   };
 
+  const dueContainerRef = useRef(null);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const ctx = gsap.context(() => {
+      gsap.fromTo('.due-tab-bar',
+        { opacity: 0, y: -12 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
+      );
+
+      const cards = document.querySelectorAll('.due-summary-card');
+      if (cards.length > 0) {
+        gsap.fromTo(cards,
+          { opacity: 0, y: 24, scale: 0.94 },
+          {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.45,
+            stagger: 0.04,
+            ease: 'back.out(1.3)',
+            clearProps: 'transform,opacity'
+          }
+        );
+      }
+
+      const panels = document.querySelectorAll('.due-panel, .due-export-panel, .due-table-wrapper');
+      if (panels.length > 0) {
+        gsap.fromTo(panels,
+          { opacity: 0, y: 18 },
+          { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power3.out', delay: 0.08 }
+        );
+      }
+    }, dueContainerRef);
+
+    return () => ctx.revert();
+  }, [activeTab, loading, summary]);
+
   return (
-    <div className="due-dashboard-container">
+    <div className="due-dashboard-container" ref={dueContainerRef}>
       {notice && <div className="due-notice-banner">{notice}</div>}
       {error && <div className="due-error-banner">{error}</div>}
 

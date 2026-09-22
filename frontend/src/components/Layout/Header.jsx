@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { FaBars, FaBell, FaUser, FaCaretDown, FaSignOutAlt } from 'react-icons/fa';
 import { useAuth } from '../../context/AuthContext';
@@ -8,6 +9,59 @@ const Header = ({ toggleSidebar }) => {
   const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const location = useLocation();
+  const headerRef = useRef(null);
+  const profileMenuRef = useRef(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      // Header drop down from top
+      tl.fromTo('.header',
+        { y: -60, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out', clearProps: 'transform' }
+      );
+
+      // Stagger child elements
+      tl.fromTo(['.header-left', '.search-box.desktop-search', '.notification-bell', '.profile-menu'],
+        { y: -18, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.45, stagger: 0.08, ease: 'back.out(1.4)', clearProps: 'transform' },
+        '-=0.3'
+      );
+
+      // Breadcrumb bar drop down
+      tl.fromTo('.breadcrumb-bar',
+        { y: -20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, ease: 'power2.out', clearProps: 'transform' },
+        '-=0.2'
+      );
+    }, headerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    // Smooth transition on breadcrumbs on route change
+    gsap.fromTo('.breadcrumbs',
+      { opacity: 0, x: -15 },
+      { opacity: 1, x: 0, duration: 0.35, ease: 'power2.out' }
+    );
+  }, [location.pathname, location.search]);
 
   const handleLogout = () => {
     logout();
@@ -162,7 +216,7 @@ const Header = ({ toggleSidebar }) => {
   };
 
   return (
-    <div className="header-wrapper">
+    <div className="header-wrapper" ref={headerRef}>
       <div className="header">
         <div className="header-left">
           <button 
@@ -180,7 +234,7 @@ const Header = ({ toggleSidebar }) => {
             onClick={handleToggleClick}
             onTouchStart={handleToggleClick}
           >
-            CDB Portal
+            CDB Portal V2
           </span>
         </div>
 
@@ -199,15 +253,27 @@ const Header = ({ toggleSidebar }) => {
             <FaBell />
           </div>
 
-          <div className="profile-menu" onClick={() => setDropdownOpen(!dropdownOpen)}>
-            <FaUser />
-            <span>{user?.username || 'User'}</span>
-            <FaCaretDown />
+          <div 
+            className="profile-menu" 
+            ref={profileMenuRef}
+            onClick={() => setDropdownOpen(prev => !prev)}
+          >
+            <FaUser className="profile-icon" />
+            <span className="profile-username">{user?.username || 'Admin'}</span>
+            <FaCaretDown className={`profile-caret ${dropdownOpen ? 'caret-open' : ''}`} />
 
             {dropdownOpen && (
-              <ul className="profile-dropdown">
-                <li onClick={handleLogout}>
-                  <FaSignOutAlt style={{ marginRight: '5px' }} /> Logout
+              <ul className="profile-dropdown" onClick={(e) => e.stopPropagation()}>
+                <li 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDropdownOpen(false);
+                    handleLogout();
+                  }}
+                  className="logout-item"
+                >
+                  <FaSignOutAlt style={{ marginRight: '8px' }} /> 
+                  <span>Logout</span>
                 </li>
               </ul>
             )}

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
   FaChevronRight,
@@ -52,29 +53,76 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   );
 
   const getInitials = (name) => {
-    if (!name) return 'AE';
+    if (!name) return 'CDB';
     const cleanName = name.replace(/[^a-zA-Z0-9\s]/g, '').trim();
     const parts = cleanName.split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return 'AE';
+    if (parts.length === 0) return 'CDB';
     if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
     return (parts[0][0] + parts[1][0]).toUpperCase();
   };
 
   const brandName = role === 'ADMIN'
-    ? 'Arshi Enterprises'
-    : (user?.companyName || user?.displayName || user?.username || 'Arshi Enterprises');
+    ? 'CDB Portal V2'
+    : (user?.companyName || user?.displayName || user?.username || 'CDB Portal V2');
 
-  const brandLogoText = role === 'ADMIN' ? 'AE' : getInitials(brandName);
+  const brandLogoText = role === 'ADMIN' ? 'CDB' : getInitials(brandName);
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      // Slide in sidebar container from left
+      tl.fromTo(sidebarRef.current,
+        { x: -50, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.6, ease: 'power3.out' }
+      );
+
+      // Pop in brand logo and title
+      tl.fromTo('.brand-logo-container',
+        { scale: 0.4, rotation: -20, opacity: 0 },
+        { scale: 1, rotation: 0, opacity: 1, duration: 0.5, ease: 'back.out(2)' },
+        '-=0.35'
+      );
+
+      tl.fromTo('.brand-title-group',
+        { x: -15, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.4 },
+        '-=0.3'
+      );
+
+      // Stagger in menu items
+      const menuItems = document.querySelectorAll('.sidebar-menu-item');
+      if (menuItems.length > 0) {
+        tl.fromTo(menuItems,
+          { x: -30, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.45, stagger: 0.035, ease: 'power2.out' },
+          '-=0.2'
+        );
+      }
+    }, sidebarRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      gsap.fromTo('.sidebar-menu-item',
+        { x: -25, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.35, stagger: 0.03, ease: 'power2.out' }
+      );
+    }
+  }, [isOpen]);
 
   return (
-    <div className={`sidebar ${isOpen ? 'open' : ''}`}>
+    <div className={`sidebar ${isOpen ? 'open' : ''}`} ref={sidebarRef}>
       <div className="sidebar-brand">
         <div className="brand-logo-container">
           <span className="brand-logo-text">{brandLogoText}</span>
         </div>
         <div className="brand-title-group">
           <h2>{brandName}</h2>
-          <span>Customer Device Portal</span>
+          <span>Device Management System</span>
         </div>
         <button className="sidebar-close-btn" onClick={() => setIsOpen(false)} aria-label="Close sidebar">
           <FaTimes />
